@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GSMHub Catalogue</title>
+
+  <!-- Dark mode setup -->
+  <script>
+    (function () {
+      const stored = localStorage.getItem("theme");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (stored === "dark" || (!stored && prefersDark)) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Extra CSS -->
+  <style>
+    @keyframes float {0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+    .animate-float{animation:float 4s ease-in-out infinite;}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+    .animate-fadeInUp{animation:fadeInUp .8s ease-out forwards;}
+    .btn-glow{position:relative;overflow:hidden;}
+    .btn-glow:hover{box-shadow:0 15px 40px rgba(79,70,229,.35),0 0 50px rgba(236,72,153,.25);}
+    .btn-glow::after{content:"";position:absolute;top:0;left:-120%;width:120%;height:100%;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);
+      transform:skewX(-20deg);transition:left .6s ease;}
+    .btn-glow:hover::after{left:120%;}
+    .lift{transition:transform .25s ease,box-shadow .25s ease,filter .25s ease;}
+    .lift:hover{transform:translateY(-6px) scale(1.02);filter:brightness(1.02);box-shadow:0 18px 40px rgba(0,0,0,.18);}
+    .reveal{opacity:0;transform:translateY(18px);}
+    .revealed{opacity:1;transform:none;transition:all .7s ease;}
+    .drawer{transform:translateX(-100%);transition:transform .3s ease;}
+    .drawer.open{transform:translateX(0);}
+    .animated-gradient{background:linear-gradient(270deg,#6366f1,#ec4899,#f59e0b);background-size:600% 600%;
+      -webkit-background-clip:text;background-clip:text;color:transparent;animation:gradientShift 10s ease infinite;}
+    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  </style>
+
+  <script defer src="script.js"></script>
+</head>
+<body class="bg-gradient-to-b from-zinc-50 via-white to-white dark:from-zinc-950 dark:via-zinc-950 dark:to-black text-zinc-900 dark:text-zinc-100 font-sans relative">
+
+  <!-- Cursor -->
+  <div id="cursor" class="pointer-events-none fixed z-[100] h-6 w-6 rounded-full border border-black/20 dark:border-white/30 backdrop-blur-sm bg-white/40 dark:bg-white/10 shadow-[0_0_40px_10px_rgba(99,102,241,0.25)]"></div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-5 right-5 bg-black/80 text-white px-4 py-2 rounded-lg hidden z-[60]"></div>
+
+  <!-- Spinner -->
+  <div id="spinner" class="hidden fixed inset-0 flex items-center justify-center bg-white/70 dark:bg-black/50 z-[55]">
+    <div class="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 backdrop-blur bg-white/70 dark:bg-black/40 border-b border-zinc-200/60 dark:border-zinc-800">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
+      <button id="menuBtn" class="md:hidden p-2 border rounded-lg">☰</button>
+      <div class="text-lg font-bold">GSM<span class="text-indigo-600">Hub</span></div>
+      <div class="flex-1"></div>
+      <div class="hidden md:flex items-center gap-2 w-[42%] relative">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">🔎</span>
+        <input id="search" type="text" placeholder="Search…" class="pl-9 w-full border rounded-lg px-3 py-2 dark:bg-zinc-900 outline-none" />
+      </div>
+      <button id="themeToggle" class="ml-2 p-2 border rounded-lg">🌙</button>
+    </div>
+  </header>
+
+  <!-- Drawer -->
+  <div id="drawer" class="drawer fixed top-0 left-0 h-full w-64 bg-white dark:bg-zinc-900 shadow-xl z-50 p-6">
+    <button id="closeDrawer" class="mb-4 px-3 py-1 border rounded">✖</button>
+    <nav class="flex flex-col gap-4">
+      <a href="#catalogue">Catalogue</a>
+      <a href="#services">Services</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 py-14 md:py-20 grid md:grid-cols-2 gap-10 items-center">
+      <div class="animate-fadeInUp">
+        <h1 class="text-3xl md:text-5xl font-extrabold mt-4">
+          GSM Tools & Services — <span class="animated-gradient">Best Offers</span>
+        </h1>
+        <p class="mt-4 text-zinc-600 dark:text-zinc-400">
+          Unlocking, FRP, Dongles, Activations & Rentals — All in one place.
+        </p>
+      </div>
+      <div class="relative animate-float">
+        <img src="utool.jpg" alt="GSM Tools" class="rounded-3xl border shadow-xl" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Controls -->
+  <section id="catalogue" class="max-w-7xl mx-auto px-4 pb-4 reveal">
+    <div class="flex items-center gap-3">
+      <!-- Desktop Filters -->
+      <div class="hidden md:flex items-center gap-2">
+        <button class="cat-btn px-3 py-1 rounded-full border" data-cat="all">All</button>
+        <button class="cat-btn px-3 py-1 rounded-full border" data-cat="rentals">Tools on Rent</button>
+        <button class="cat-btn px-3 py-1 rounded-full border" data-cat="activations">Activations</button>
+        <button class="cat-btn px-3 py-1 rounded-full border" data-cat="services">Services</button>
+      </div>
+      <!-- Mobile Filters -->
+      <div class="md:hidden flex gap-2 overflow-x-auto pb-2">
+        <button class="cat-btn px-3 py-1 rounded-full border" data-cat="all">All</button>
+        <button class="cat-btn px-3 py-1 rounded-full border" data-cat="rentals">Rentals</button>
+        <button class="cat-btn px-3 py-1 rounded-full border" data-cat="activations">Activations</button>
+        <button class="cat-btn px-3 py-1 rounded-full border" data-cat="services">Services</button>
+      </div>
+      <div class="flex-1"></div>
+      <select id="sort" class="px-3 py-2 rounded-lg border dark:border-zinc-800">
+        <option value="featured">Featured</option>
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
+        <option value="rating">Top Rated</option>
+      </select>
+    </div>
+  </section>
+
+  <!-- Product Grid -->
+  <section class="max-w-7xl mx-auto px-4 pb-16 reveal">
+    <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </section>
+
+  <!-- Quick View -->
+  <div id="quickModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50">
+    <div id="quickBox" class="bg-white dark:bg-zinc-900 p-6 rounded-2xl max-w-md w-full transform scale-95 opacity-0 transition-all duration-300">
+      <img id="quickImg" class="w-full rounded-lg mb-3" />
+      <div id="quickTitle" class="font-bold text-xl mb-1"></div>
+      <div id="quickPrice" class="text-lg font-semibold mb-3"></div>
+      <div id="quickRating" class="flex mb-2"></div>
+      <div id="quickSpecs" class="flex gap-2 flex-wrap mb-4"></div>
+      <div class="flex justify-end gap-2">
+        <button onclick="closeQuick()" class="px-4 py-2 rounded-lg border">Close</button>
+        <a id="addQuickWA" target="_blank" rel="noopener" class="btn-glow px-4 py-2 bg-green-600 text-white rounded-lg">WhatsApp</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="py-10 border-t border-zinc-200 dark:border-zinc-800 text-center text-sm text-zinc-500">
+    © <span id="year"></span> GSMHub. All rights reserved. Contact: +923066235036 | WhatsApp
+  </footer>
+
+  <!-- Dark/Light Toggle Script -->
+  <script>
+    document.getElementById("themeToggle").addEventListener("click", function () {
+      const html = document.documentElement;
+      if (html.classList.contains("dark")) {
+        html.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+        this.textContent = "🌙";
+      } else {
+        html.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+        this.textContent = "☀️";
+      }
+    });
+  </script>
+</body>
+</html>
