@@ -1,4 +1,4 @@
-// script.js (patched for mobile issue)
+// script.js (final fixed version)
 // Shortcuts
 const $ = s => document.querySelector(s), $$ = s => document.querySelectorAll(s);
 
@@ -97,7 +97,7 @@ function categoryPriority(cat){
   if(cat === "services") return 2;
   return 3;
 }
-function apply(){
+function apply(initial=false){
   $("#spinner")?.classList.remove("hidden");
   setTimeout(()=>{
     let list = products.filter(p =>
@@ -116,12 +116,16 @@ function apply(){
 
     render(list);
 
-    // reveal animation
-    $$(".reveal").forEach(el => io.observe(el));
+    if(initial){
+      // On first load, reveal everything immediately
+      $$(".reveal").forEach(el => el.classList.add("revealed"));
+    } else {
+      // Later renders use scroll animation
+      $$(".reveal").forEach(el => io.observe(el));
+    }
 
-    // always hide spinner
     $("#spinner")?.classList.add("hidden");
-  }, 200);
+  }, 150);
 }
 
 // Bind controls
@@ -137,8 +141,8 @@ const io = new IntersectionObserver(entries => {
   });
 }, { threshold: .15 });
 
-// initial render
-apply();
+// initial render with instant reveal
+apply(true);
 
 // Quick view
 function openQuick(id){
