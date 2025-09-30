@@ -1,4 +1,4 @@
-// script.js (updated)
+// script.js (patched for mobile issue)
 // Shortcuts
 const $ = s => document.querySelector(s), $$ = s => document.querySelectorAll(s);
 
@@ -22,16 +22,15 @@ $("#closeDrawer")?.addEventListener("click", () => $("#drawer")?.classList.remov
 // WhatsApp number
 const WA_NUMBER = "923066235036";
 
-// Products (images updated; AntiCrack uses the link you provided)
+// Products (fixed iPhone bypass image)
 const products = [
-  // Services
   {id:"s1",name:"Apple ID Create",brand:"Apple",price:200,rating:4.8,category:"services",specs:["Fast","All devices"],img:"images/apple-id.webp"},
   {id:"s2",name:"Infinix/Tecno/Itel AntiCrack",brand:"Multi",price:0,rating:4.6,category:"services",specs:["Low price","Latest patch"],
     img:"https://i.ytimg.com/vi/9kXPMB-OJYk/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLCyWT1iJRZTPXQVcuoYVJr8ijtIEQ"
   },
   {id:"s3",name:"Android 15 FRP Clear",brand:"Multi",price:0,rating:4.7,category:"services",specs:["Fix Playstore","Clear bugs"],img:"images/android-15-frp.jpg"},
   {id:"s4",name:"Samsung FRP Worldwide",brand:"Samsung",price:0,rating:4.7,category:"services",specs:["Wholesale","Android 14/15"],img:"images/samsung-frp.png"},
-  {id:"s5",name:"iPhone Bypass 6s-16 Pro Max",brand:"Apple",price:0,rating:4.5,category:"services",specs:["Passcode/MEID"],img:"images/iphone-bypass."},
+  {id:"s5",name:"iPhone Bypass 6s-16 Pro Max",brand:"Apple",price:0,rating:4.5,category:"services",specs:["Passcode/MEID"],img:"images/iphone-bypass.jpg"}, // fixed
   {id:"s6",name:"Mi Account Remove",brand:"Xiaomi",price:0,rating:4.5,category:"services",specs:["Permanent","Worldwide"],img:"images/mi-account-remove.jpg"},
 
   // Activations
@@ -41,7 +40,7 @@ const products = [
   {id:"a4",name:"Chimera Pro Activation",brand:"Chimera",price:0,rating:4.7,category:"activations",specs:["Pro features"],img:"images/chimera-tool-samsung-license-activation-1year-500x500.webp"},
   {id:"a5",name:"TR Tools / Cheetah / CF Tool",brand:"Multi",price:0,rating:4.6,category:"activations",specs:["Bundle"],img:"images/multi-tools.webp"},
 
-  // Rentals (priority)
+  // Rentals
   {id:"r1",name:"UnlockTool (Rent)",brand:"UnlockTool",price:130,rating:4.7,category:"rentals",specs:["Instant use"],img:"images/utool.jpg"},
   {id:"r2",name:"AMT Tool (Rent)",brand:"AMT",price:100,rating:4.6,category:"rentals",specs:["Cheap"],img:"images/amt.png"},
   {id:"r3",name:"DFT Pro (Rent)",brand:"DFT",price:330,rating:4.7,category:"rentals",specs:["Updated"],img:"images/dft.webp"},
@@ -59,20 +58,21 @@ function waLinkFor(productName){
   return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
 }
 
-// Toast (optional)
+// Toast
 function showToast(msg){
   const t = $("#toast"); if(!t) return;
   t.textContent = msg; t.classList.remove("hidden");
   clearTimeout(showToast._t); showToast._t = setTimeout(()=> t.classList.add("hidden"), 2000);
 }
 
-// Product HTML with image onerror fallback
+// Product HTML with reveal class
 function productHTML(p){
   const wa = waLinkFor(p.name);
-  // ensure safe alt
   const alt = (p.name || "product").replace(/"/g,"");
-  return `<div class="lift rounded-2xl bg-white dark:bg-zinc-900 border p-4">
-    <img src="${p.img}" alt="${alt}" onerror="this.onerror=null;this.src='https://placehold.co/300x200?text=Image+Not+Found'" class="w-full h-40 object-cover rounded-lg mb-3"/>
+  return `<div class="reveal lift rounded-2xl bg-white dark:bg-zinc-900 border p-4">
+    <img src="${p.img}" alt="${alt}" loading="lazy"
+      onerror="this.onerror=null;this.src='https://placehold.co/300x200?text=Image+Not+Found'"
+      class="w-full h-40 object-cover rounded-lg mb-3"/>
     <div class="flex justify-between">
       <span class="font-semibold">${p.brand}</span>
       <button onclick="toggleWish(this)" class="wish">♡</button>
@@ -105,7 +105,6 @@ function apply(){
       (p.name.toLowerCase().includes(query) || p.brand.toLowerCase().includes(query))
     );
 
-    // rentals first, then sort option
     list.sort((a,b) => {
       const p = categoryPriority(a.category) - categoryPriority(b.category);
       if(p !== 0) return p;
@@ -116,9 +115,12 @@ function apply(){
     });
 
     render(list);
-    $("#spinner")?.classList.add("hidden");
-    // attach reveal observer to newly rendered cards
+
+    // reveal animation
     $$(".reveal").forEach(el => io.observe(el));
+
+    // always hide spinner
+    $("#spinner")?.classList.add("hidden");
   }, 200);
 }
 
